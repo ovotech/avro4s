@@ -2,6 +2,7 @@ import sbt._
 import sbt.Keys._
 import sbtrelease.ReleasePlugin
 import com.typesafe.sbt.pgp.PgpKeys
+import bintray.BintrayPlugin.autoImport._
 
 /** Adds common settings automatically to all subprojects */
 object GlobalPlugin extends AutoPlugin {
@@ -18,6 +19,8 @@ object GlobalPlugin extends AutoPlugin {
   override def trigger = allRequirements
   override def projectSettings = publishingSettings ++ Seq(
     organization := org,
+    bintrayOrganization := Some("ovotech"),
+    licenses in ThisBuild += ("MIT", url("http://opensource.org/licenses/MIT")),
     scalaVersion := ScalaVersion,
     crossScalaVersions := Seq("2.11.8", "2.12.1"),
     resolvers += Resolver.mavenLocal,
@@ -39,16 +42,7 @@ object GlobalPlugin extends AutoPlugin {
   val publishingSettings = Seq(
     publishMavenStyle := true,
     publishArtifact in Test := false,
-    ReleasePlugin.autoImport.releasePublishArtifactsAction := PgpKeys.publishSigned.value,
     ReleasePlugin.autoImport.releaseCrossBuild := true,
-    publishTo := {
-      val nexus = "https://oss.sonatype.org/"
-      if (isSnapshot.value) {
-        Some("snapshots" at s"${nexus}content/repositories/snapshots")
-      } else {
-        Some("releases" at s"${nexus}service/local/staging/deploy/maven2")
-      }
-    },
     pomExtra := {
       <url>https://github.com/sksamuel/avro4s</url>
         <licenses>
